@@ -1,7 +1,4 @@
-/* =====================================================================
-   EduGest - Frontend (HTML + JavaScript puro)
-   Todo se pide al backend con fetch('/api/...'); nada de datos escritos a mano.
-   ===================================================================== */
+
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -63,7 +60,6 @@ const tab = (heads, filas) =>
   `<div class="tw"><table><thead><tr>${heads.map(x => `<th>${x}</th>`).join('')}</tr></thead><tbody>${
     filas.map(f => `<tr>${f.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 
-/* ---------- Ventanas y formularios ---------- */
 function ventana(titulo, html) {
   const ov = document.createElement('div');
   ov.className = 'overlay';
@@ -105,7 +101,6 @@ function formulario({ titulo, campos, valores = {}, guardar, texto = 'Guardar', 
   };
 }
 
-/* ---------- Lista genérica (buscar + filtrar + tabla + acciones) ---------- */
 async function lista(cfg) {
   let rows = await cfg.cargar();
   main.innerHTML = cabecera(cfg.titulo, cfg.sub, cfg.nuevo ? `<button class="btn" id="nuevo">+ ${cfg.nuevo}</button>` : '') +
@@ -139,7 +134,6 @@ async function lista(cfg) {
 }
 const btnAcc = (act, txt, cls = '') => `<button class="link ${cls}" data-act="${act}">${txt}</button>`;
 
-/* ---------- Sesión ---------- */
 const MENU_INICIO = () => MENUS[sesion.rol][0][0];
 
 function mostrarLogin() { $('#app').hidden = true; $('#login').hidden = false; }
@@ -183,7 +177,7 @@ $('#formLogin').onsubmit = async e => {
   } catch (err) { p.textContent = err.message; p.hidden = false; }
 };
 
-/* ---------- Ficha del estudiante (la usa el admin y el propio estudiante) ---------- */
+
 function htmlFicha(f, sec = ['datos', 'notas', 'asist']) {
   const d = f.datos, dt = (a, b) => `<div><small>${a}</small><b>${esc(b || '—')}</b></div>`;
   let x = '';
@@ -211,9 +205,7 @@ function htmlFicha(f, sec = ['datos', 'notas', 'asist']) {
   return x;
 }
 
-/* =====================================================================
-   PÁGINAS DEL ADMINISTRADOR
-   ===================================================================== */
+
 PAGINAS.dashboard = async () => {
   const d = await api('/dashboard');
   const tarjetas = [['Estudiantes', d.estudiantes, 'users', ''], ['Docentes', d.docentes, 'user', 'verde'],
@@ -227,7 +219,7 @@ PAGINAS.dashboard = async () => {
       <b>${r.promedio ?? 'Sin notas'}</b></div>`).join('') : '<p class="empty">No hay períodos registrados.</p>'}</div></div>`;
 };
 
-/* --- Estudiantes --- */
+
 const camposEstudiante = (edit, salones) => [
   { name: 'documento', label: 'Documento', req: 1 },
   { name: 'fecha_nacimiento', label: 'Fecha de nacimiento', type: 'date', req: 1 },
@@ -287,7 +279,7 @@ PAGINAS.estudiantes = async () => {
   });
 };
 
-/* --- Docentes --- */
+
 const camposDocente = [
   { name: 'documento', label: 'Documento', req: 1 }, { name: 'especialidad', label: 'Especialidad' },
   { name: 'nombres', label: 'Nombres', req: 1 }, { name: 'apellidos', label: 'Apellidos', req: 1 },
@@ -333,7 +325,6 @@ PAGINAS.docentes = async () => {
   });
 };
 
-/* --- Salones --- */
 PAGINAS.salones = async () => {
   const cat = await api('/catalogos');
   const campos = [
@@ -366,7 +357,6 @@ PAGINAS.salones = async () => {
   });
 };
 
-/* --- Asignaturas --- */
 PAGINAS.asignaturas = async () => {
   const campos = [{ name: 'nombre', label: 'Nombre', req: 1, full: 1 }, { name: 'descripcion', label: 'Descripción', full: 1 },
     { name: 'intensidad_horaria', label: 'Intensidad horaria (horas por semana)', type: 'number', min: 1, full: 1 }];
@@ -383,7 +373,7 @@ PAGINAS.asignaturas = async () => {
   });
 };
 
-/* --- Cursos (asignatura + salón + período + docente) --- */
+
 PAGINAS.cursos = async () => {
   const cat = await api('/catalogos');
   const docenteOp = { name: 'id_docente', label: 'Docente', type: 'select', req: 1, opciones: opciones(cat.docentes, 'id_docente', 'nombre') };
@@ -410,7 +400,6 @@ PAGINAS.cursos = async () => {
   });
 };
 
-/* --- Selector de curso (lo usan Matrículas, Calificaciones y Asistencias) --- */
 const selCurso = cursos => `<select id="curso">${cursos.length ? '' : '<option value="">No hay cursos</option>'}${cursos.map(c =>
   `<option value="${c.id_curso}" ${String(c.id_curso) === String(cursoSel) ? 'selected' : ''}>${esc(c.salon)} · ${esc(c.asignatura)} · ${esc(c.periodo)}</option>`).join('')}</select>`;
 
@@ -421,7 +410,6 @@ function usarCurso(cb) {
   s.onchange = go; go();
 }
 
-/* --- Matrículas --- */
 PAGINAS.matriculas = async () => {
   const cursos = await api('/docencia/cursos');
   main.innerHTML = cabecera('Matrículas', 'Cada matrícula une a un estudiante con un curso de su salón') +
@@ -464,9 +452,7 @@ PAGINAS.matriculas = async () => {
   };
 };
 
-/* =====================================================================
-   ADMINISTRADOR Y DOCENTE: calificaciones y asistencias
-   ===================================================================== */
+
 PAGINAS.calificaciones = async () => {
   const cursos = await api('/docencia/cursos');
   main.innerHTML = cabecera('Calificaciones', 'Notas de 0.0 a 5.0. La nota definitiva se pondera con el porcentaje de cada evaluación.') +
@@ -542,7 +528,6 @@ PAGINAS.asistencias = async () => {
   };
 };
 
-/* --- Usuarios --- */
 PAGINAS.usuarios = async () => {
   await lista({
     titulo: 'Usuarios', sub: 'Cuentas de acceso al sistema. Las cuentas nuevas se crean desde Estudiantes y Docentes.',
@@ -560,9 +545,6 @@ PAGINAS.usuarios = async () => {
   });
 };
 
-/* =====================================================================
-   DOCENTE
-   ===================================================================== */
 PAGINAS.miscursos = async () => {
   const c = await api('/docencia/cursos');
   main.innerHTML = cabecera(`¡Bienvenido, ${esc(sesion.nombre.split(' ')[0])}!`, 'Estos son los cursos que tienes asignados.') +
@@ -572,9 +554,7 @@ PAGINAS.miscursos = async () => {
   main.onclick = e => { const b = e.target.closest('[data-ir]'); if (b) { cursoSel = b.dataset.curso; ir(b.dataset.ir); } };
 };
 
-/* =====================================================================
-   ESTUDIANTE (solo ve su propia información)
-   ===================================================================== */
+
 PAGINAS.info = async () => {
   const f = await api('/yo/ficha');
   main.innerHTML = cabecera(`¡Bienvenido, ${esc(sesion.nombre.split(' ')[0])}!`, 'Tus datos registrados en la institución') +

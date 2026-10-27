@@ -1,4 +1,4 @@
-// Pone una contraseña real (hash bcrypt) a los usuarios de ejemplo del SQL.
+
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const pool = require('../src/db');

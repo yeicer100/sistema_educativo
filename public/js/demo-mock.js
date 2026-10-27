@@ -1,5 +1,4 @@
-/* Modo demostración: simula el backend con datos de ejemplo (no usa MySQL).
-   Cambia de rol con:  demo.html?rol=admin | docente | estudiante */
+
 (() => {
   const rol = new URLSearchParams(location.search).get('rol') || 'admin';
   localStorage.setItem('token', 'demo');
